@@ -1,0 +1,45 @@
+name: github-codedeploy
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  AWS_REGION: us-east-1
+  S3BUCKET: githubcodedeploy
+
+jobs:
+  upload:
+    name: upload
+    runs-on: ubuntu-20.04
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
+          role-session-name: GitHub-Action-codedeploy-Role
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Upload Artifact to s3
+        run: aws deploy push --application-name test --source /app/ --s3-location s3://{{ env.S3BUCKET }}/gitcodeploytest.zip
+
+  deploy:
+    needs: upload
+    runs-on: ubuntu-20.04
+    environment: Dev
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v3
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
+        role-session-name: GitHub-Action-Role
+        aws-region: ${{ env.AWS_REGION }}
+    - run: aws deploy create-deployment --application-name test --deployment-group-name codedeploy --s3-location bucket=${{ env.S3BUCKET }}, key=gitcodedeploytest.zip, bundleType=zip --ignore-application-stop-failures --file-exists-behavior OVERWRITE
