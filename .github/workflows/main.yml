@@ -1,14 +1,5 @@
-deploy:
-    needs: build
-    runs-on: ubuntu-20.04
-    environment: Dev
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-    - uses: actions/checkout@v3
-    - uses: aws-actions/configure-aws-credentials@v1
-      with:name: github-codedeploy
+name: github-codedeploy
+
 on:
   push:
     branches:
@@ -16,7 +7,6 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  applicationfolder: app
   S3BUCKET: githubcodedeploy
 
 jobs:
@@ -36,8 +26,7 @@ jobs:
           role-session-name: GitHub-Action-codedeploy-Role
           aws-region: ${{ env.AWS_REGION }}
       - name: Upload Artifact to s3
-        run: |
-          aws deploy push --application-name test --source /app/ --s3-location s3://{{ env.S3BUCKET }}/gitcodeploytest.zip
+        run: aws deploy push --application-name test --source /app/ --s3-location s3://{{ env.S3BUCKET }}/gitcodeploytest.zip
 
   deploy:
     needs: upload
