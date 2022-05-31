@@ -26,7 +26,7 @@ jobs:
           role-session-name: GitHub-Action-codedeploy-Role
           aws-region: ${{ env.AWS_REGION }}
       - name: Upload Artifact to s3
-        run: aws deploy push --application-name test --source /app/ --s3-location s3://{{ env.S3BUCKET }}/gitcodeploytest.zip
+        run: aws deploy push --application-name test --source /app/ --s3-location s3://${{ env.S3BUCKET }}/gitcodeploytest.zip
 
   deploy:
     needs: upload
