@@ -42,4 +42,4 @@ jobs:
         role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
         role-session-name: GitHub-Action-Role
         aws-region: ${{ env.AWS_REGION }}
-    - run: aws deploy create-deployment --application-name test --deployment-group-name codedeploy --s3-location bucket=${{ env.S3BUCKET }},key=gitcodeploytest.zip,bundleType=zip --ignore-application-stop-failures --file-exists-behavior OVERWRITE
+    - run: aws deploy create-deployment --application-name ${{ env.CDNAME }} --deployment-group-name ${{ env.CDNAME }} --s3-location bucket=${{ env.S3BUCKET }},key=gitcodeploytest.zip,bundleType=zip --ignore-application-stop-failures --file-exists-behavior OVERWRITE
