@@ -5,10 +5,6 @@ on:
     branches:
       - master
 
-env:
-  AWS_REGION: us-east-1
-  S3BUCKET: githubcodedeploy
-
 jobs:
   upload:
     name: upload
@@ -24,9 +20,9 @@ jobs:
         with:
           role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
           role-session-name: GitHub-Action-codedeploy-Role
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
       - name: Upload Artifact to s3
-        run: aws deploy push --application-name test --source app/ --s3-location s3://${{ env.S3BUCKET }}/gitcodeploytest.zip
+        run: aws deploy push --application-name test --source app/ --s3-location s3://${{ secrets.S3BUCKET }}/gitcodeploytest.zip
 
   deploy:
     needs: upload
@@ -41,5 +37,5 @@ jobs:
       with:
         role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
         role-session-name: GitHub-Action-Role
-        aws-region: ${{ env.AWS_REGION }}
-    - run: aws deploy create-deployment --application-name ${{ env.CDNAME }} --deployment-group-name ${{ env.CDNAME }} --s3-location bucket=${{ env.S3BUCKET }},key=gitcodeploytest.zip,bundleType=zip --ignore-application-stop-failures --file-exists-behavior OVERWRITE
+        aws-region: ${{ secrets.AWS_REGION }}
+    - run: aws deploy create-deployment --application-name ${{ secrets.CDNAME }} --deployment-group-name ${{ secrets.CDNAME }} --s3-location bucket=${{ secrets.S3BUCKET }},key=gitcodeploytest.zip,bundleType=zip --ignore-application-stop-failures --file-exists-behavior OVERWRITE
