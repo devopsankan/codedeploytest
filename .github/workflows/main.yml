@@ -27,7 +27,6 @@ jobs:
   deploy:
     needs: upload
     runs-on: ubuntu-20.04
-    environment: Dev
     permissions:
       id-token: write
       contents: read
